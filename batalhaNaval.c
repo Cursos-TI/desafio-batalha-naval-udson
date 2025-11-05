@@ -4,37 +4,110 @@
 // Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
 // Siga os comentários para implementar cada parte do desafio.
 
+// Definição de cores do texto do console
+#define RED "\033[0;31m"
+#define GREEN "\033[0;32m"
+#define YELLOW "\033[0;33m"
+#define BLUE "\033[0;34m"
+#define MAGENTA "\033[0;35m"
+#define CYAN "\033[0;36m"
+#define WHITE "\033[0;37m"
+#define RESET "\033[0m"
+
 int main() {
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
+    int erro = 0;
+    const int TAB_V = 10, TAB_H = 10;   // Dimensões do tabuleiro
+    int tabuleiro[10][10][2];
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
+    // Inicializa tabuleiro
+    for(int i = 0; i < TAB_H; i++) {
+        for(int j = 0; j < TAB_V; j++)
+        {
+            tabuleiro[i][j][0] = 0;
+            tabuleiro[i][j][1] = 37;
+        }
+    }
 
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
+    // Declaração e inicialização dos vetores dos navios
+    // Navio: {Tamanho, 0=Horizontal/1=Vertical, Início_Linha[0..9], Início_Coluna[0..9]}
+    int navios[2][4] = {
+        {3, 0, 1, 5},
+        {3, 1, 3, 5},
+    };
 
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-    
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
 
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
+    printf(GREEN"\n\n    .:: BATALHA NAVAL ::.\n\n"RESET);
+    // Insere navios no tabuleiro
+    for(int i = 0; i < 4; i++) {    // Percorre o vetor de navios
+        if(navios[i][1] == 0) {     // Seleciona navios na horizontal
+            if((TAB_H - navios[i][3] - navios[i][0]) >= 0) { // Verifica se o navio cabe no tabuleiro
+                for(int j = 0; j < navios[i][0]; j++) {
+                    if(tabuleiro[navios[i][2]][navios[i][3] + j][0] == 3) {    // Verifica conicidências entre navios
+                        printf(RED"Erro! O navio %d coincide com outro navio na casa %c%02d.\n"RESET, i + 1, navios[i][3] + j + 65, navios[i][2] + 1);
+                        tabuleiro[navios[i][2]][navios[i][3] + j][1] = 31;
+                    } else {
+                        tabuleiro[navios[i][2]][navios[i][3] + j][0] = 3;
+                        tabuleiro[navios[i][2]][navios[i][3] + j][1] = 34;
+                        
+                    }
+                }
+            }
+            else {
+                printf(RED"Erro! O navio %d ultrapassa os limites do tabuleiro.\n"RESET, i + 1);
+                erro = 1;
+            }
+        } else {    // Seleciona navios na vertical
+            if((TAB_V - navios[i][2] - navios[i][0]) >= 0) { // Verifica se o navio cabe no tabuleiro
+                for(int j = 0; j < navios[i][0]; j++) {
+                    if(tabuleiro[navios[i][2] + j][navios[i][3]][0] == 3) {    // Verifica conicidências entre navios
+                        printf(RED"Erro! O navio %d coincide com outro navio na casa %c%02d.\n"RESET, i + 1, navios[i][3] + 65, navios[i][2] + j + 1);
+                        tabuleiro[navios[i][2] + j][navios[i][3]][1] = 31;
+                    } else {
+                        tabuleiro[navios[i][2] + j][navios[i][3]][0] = 3;
+                        tabuleiro[navios[i][2] + j][navios[i][3]][1] = 34;
+                    }
+                }
+            }
+            else {
+                printf(RED"Erro! O navio %d ultrapassa os limites do tabuleiro.\n"RESET, i + 1);
+                erro = 1;
+            }
+        }
+    }
+
+    // Imprime tabuleiro com os navios
+    if(!erro) { // Imprime o tabuleiro se não houver erros
+        printf(WHITE"     ");
+        for(int i = 65; i < 65 + TAB_H; i++) {
+            printf("%c ", i);
+        }
+        printf("\n");
+        printf("   ┌");
+        for (int i = 0; i < TAB_H * 2 + 1; i++)
+        {
+            printf("─");
+        }
+        printf("┐\n");
+
+        for (int i = 0; i < TAB_H; i++)
+        {
+            printf("%02d │ ", i+1);
+            for (int j = 0; j < TAB_V; j++)
+            {
+                printf("\033[0;%dm%d \033[0m", tabuleiro[i][j][1] , tabuleiro[i][j][0]);
+            }
+            printf("│\n");
+        }
+
+        printf("   └");
+        for (int i = 0; i < TAB_H * 2 + 1; i++)
+        {
+            printf("─");
+        }
+        printf("┘\n");
+
+        printf("\n\n"RESET);
+    }
 
     return 0;
 }
